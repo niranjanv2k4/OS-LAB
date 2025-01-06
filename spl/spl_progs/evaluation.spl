@@ -1,0 +1,28 @@
+alias a R0;
+alias b R1;
+alias c R3;
+
+a = 1;
+b = 1;
+c = 1;
+R4 = " ";
+while(a < 15)do
+	b = a+1;
+	while(b < 15) do
+		c = b+1;
+		while(c < 15) do
+			if(a*a + b*b == c*c)then
+				print a;
+				print b;
+				print c;
+				print R4;
+				break; 
+				
+			endif;
+			c = c + 1;
+		endwhile;
+		b = b + 1;
+	endwhile;
+	a = a + 1;
+endwhile;
+
