@@ -1,9 +1,12 @@
+//init program
 loadi(65, 7);
 loadi(66, 8);
 
+//interrupt
 loadi(22, 35);
 loadi(23, 36);
 
+//exception
 loadi(2, 15);
 loadi(3, 16);
 
