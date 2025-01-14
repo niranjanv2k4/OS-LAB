@@ -1,0 +1,28 @@
+type
+
+Student{
+        str name;
+        int marks;
+}
+endtype
+
+int main(){
+decl
+Student var;
+int heap;
+enddecl
+
+begin
+        heap=initialize();
+        var = alloc();
+
+        var.name = "John";
+        var.marks = 89;
+
+	heap = exposcall("Write", -2, var.name);
+        heap = exposcall("Write", -2, var.marks);
+        
+	free(var);
+	return 0;
+end
+}
