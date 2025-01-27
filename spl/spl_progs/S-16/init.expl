@@ -1,0 +1,48 @@
+decl 
+    int n, A[100], Bubblesort(int last);
+enddecl
+
+int Bubblesort(int last){
+    decl
+        int temp, i, j;
+    enddecl
+    begin
+        i=0;
+        while(i<=n)do 
+            j=0;  
+            while(j<=n)do   
+                if(A[i]>A[j])then   
+                    temp = A[j];
+                    A[j]=A[i];
+                    A[i]=temp;
+                endif;
+                j=j+1;
+            endwhile;
+            i=i+1;
+        endwhile;
+        return 0;
+    end
+}
+
+int main(){
+    decl   
+        int i, r, temp;
+    enddecl
+    begin
+        i=0;
+        read(n);
+        while(i<n)do    
+            read(A[i]);
+            i=i+1;
+        endwhile;
+        r = Bubblesort(n-1);
+        
+        r=0;
+        while(r<n)do    
+            temp = exposcall("Write", -2, A[r]);
+            r=r+1;
+        endwhile;
+        return 0;
+
+    end
+}

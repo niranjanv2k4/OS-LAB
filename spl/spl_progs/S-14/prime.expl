@@ -1,0 +1,25 @@
+int main() {
+decl
+	int a, temp, flag, count;
+enddecl
+begin
+	a=2;
+	flag=0;
+	while( a<= 100) do
+		count =2;
+		while(count<=(a/2)) do
+			if((a%count)==0) then
+				flag=1;
+			endif;
+			count = count + 1;
+		endwhile;
+		if(flag==0) then
+			//temp=exposcall("Write", -2, "user2");
+			temp=exposcall("Write", -2, a) ;
+		endif;
+		flag=0;
+		a = a + 1;
+	endwhile;
+	return 0;
+end
+}

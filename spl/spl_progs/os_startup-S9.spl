@@ -19,6 +19,7 @@ loadi(4, 17);
 loadi(5, 18);
 
 PTLR = 10;
+PTBR = PAGE_TABLE_BASE;
 
 [PTBR + 0] = 63;
 [PTBR + 1] = "0100";

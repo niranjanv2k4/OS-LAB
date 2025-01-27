@@ -1,0 +1,14 @@
+int main(){
+decl
+        int a, temp;
+enddecl
+begin
+        a = 0;
+        while (a <= 100)do
+                temp=exposcall("Write", -2, a);
+                //temp=exposcall("Write", -2, "user1");
+		a = a + 2;
+        endwhile;
+        return 0;
+end
+}

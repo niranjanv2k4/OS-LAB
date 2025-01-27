@@ -1,0 +1,36 @@
+alias funNo R1;
+
+if(funNo == GET_FREE_PAGE)then
+    [SYSTEM_STATUS_TABLE + 3] = [SYSTEM_STATUS_TABLE + 3] + 1;
+    while([SYSTEM_STATUS_TABLE + 2] == 0)do
+        [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 4] = WAIT_MEM;
+        call MOD_5;
+    endwhile;
+    [SYSTEM_STATUS_TABLE + 2] = [SYSTEM_STATUS_TABLE + 2] - 1;
+    [SYSTEM_STATUS_TABLE + 3] = [SYSTEM_STATUS_TABLE + 3] - 1;
+
+    alias freepage R0;
+    freepage = 0;
+    while([MEMORY_FREE_LIST + freepage]!=0 && freepage<128)do   
+        freepage = freepage + 1;
+    endhwhile;
+
+    [MEMORY_FREE_LIST + freepage] = 1;
+    return;
+endif;
+if(funNo == RELEASE_PAGE)then  
+    alias RelPage R2;
+    [MEMORY_FREE_LIST + RelPage] = [MEMORY_FREE_LIST + RelPage] - 1;
+    if([MEMORY_FREE_LIST + RelPage]==0)then 
+        [SYSTEM_STATUS_TABLE + 2] = [SYSTEM_STATUS_TABLE + 2] + 1;
+    endif;
+    alias count R7;
+    count = 0;
+    while(count < 16)do 
+        if([PROCESS_TABLE + count*16 + 1]!=-1 && [PROCESS_TABLE + count*16 + 4]==WAIT_MEM)then
+            [PROCESS_TABLE + count*16 + 4]==READY;
+        endif;
+        count = count + 1;
+    endhwhile;
+    return;
+endif;       
