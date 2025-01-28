@@ -121,6 +121,7 @@ PTLR = 10;
 //setting the memfreelist
 alias counter R10;
 counter=0;
+[SYSTEM_STATUS_TABLE + 2] = 0;
 while(counter<128)do
     if(counter<83)then
         [MEMORY_FREE_LIST + counter] = 1;
