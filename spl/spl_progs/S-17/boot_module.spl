@@ -133,6 +133,4 @@ endwhile;
 //WAIT_MEM_COUNT
 [SYSTEM_STATUS_TABLE + 3] = 0;
 
-//MEM_FREE_COUNT
-[SYSTEM_STATUS_TABLE + 2] = 53;
 return;
