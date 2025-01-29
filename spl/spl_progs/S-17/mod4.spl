@@ -1,7 +1,7 @@
 alias functionNum R1;
 alias currentPID R2;
 //print "mod4";
-if(functionNum==3)then
+if(functionNum==TERMINAL_WRITE)then
     multipush(R1, R2, R3);
     functionNum = 8;
     currentPID = [SYSTEM_STATUS_TABLE + 1];
@@ -15,8 +15,7 @@ if(functionNum==3)then
     multipop(R1, R2, R3);
     return;
 endif;
-
-if(functionNum==4)then  
+if(functionNum==TERMINAL_READ)then  
     multipush(R1, R2, R3);
     functionNum = 8;
     currentPID = [SYSTEM_STATUS_TABLE + 1];

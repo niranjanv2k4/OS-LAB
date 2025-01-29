@@ -5,6 +5,8 @@ echo "boot module"
 ./spl ./spl_progs/new/boot_module.spl
 echo "timer"
 ./spl ./spl_progs/new/timer.spl
+echo "disk"
+./spl ./spl_progs/new/disk.spl
 echo "console"
 ./spl ./spl_progs/new/console.spl
 echo "int9"

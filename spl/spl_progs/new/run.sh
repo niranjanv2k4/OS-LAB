@@ -7,6 +7,7 @@ load --module 2 $HOME/myexpos/spl/spl_progs/new/mod2.xsm
 load --module 1 $HOME/myexpos/spl/spl_progs/new/mod1.xsm
 load --module 0 $HOME/myexpos/spl/spl_progs/new/mod0.xsm
 load --int=timer $HOME/myexpos/spl/spl_progs/new/timer.xsm
+load --int=disk $HOME/myexpos/spl/spl_progs/new/disk.xsm
 load --int=console $HOME/myexpos/spl/spl_progs/new/console.xsm
 load --int=9 $HOME/myexpos/spl/spl_progs/new/int9.xsm
 load --int=7 $HOME/myexpos/spl/spl_progs/new/int7.xsm
