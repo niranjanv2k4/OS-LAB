@@ -29,7 +29,6 @@ if(functionNum==RELEASE_TERMINAL)then
     return;
 endif;
 if(functionNum==ACQUIRE_DISK)then
-    //print "acquiring";
     while([DISK_STATUS_TABLE]==1)do
         [PROCESS_TABLE + currentPID*16 + 4]=WAIT_DISK;
         multipush(R1, R2);
@@ -38,6 +37,5 @@ if(functionNum==ACQUIRE_DISK)then
     endwhile;
     [DISK_STATUS_TABLE]=1;
     [DISK_STATUS_TABLE + 4]=currentPID;
-    //print "acquired";
     return;
 endif;

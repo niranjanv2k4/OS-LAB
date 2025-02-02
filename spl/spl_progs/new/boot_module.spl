@@ -149,5 +149,5 @@ while(counter<16)do
     [init_perprocess + counter] = -1;
     counter = counter + 2;
 endwhile;
-
+breakpoint;
 return;

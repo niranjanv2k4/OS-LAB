@@ -1,6 +1,8 @@
 cd $HOME/myexpos/spl
 echo "os-startup"
 ./spl ./spl_progs/new/os-startup.spl
+echo "exception"
+./spl ./spl_progs/new/exception.spl
 echo "boot module"
 ./spl ./spl_progs/new/boot_module.spl
 echo "timer"
@@ -34,8 +36,8 @@ echo "idle"
 ./expl ../spl/spl_progs/new/idle.expl
 echo "init"
 ./expl ../spl/spl_progs/new/init.expl
-echo "odd"                               
-./expl ../spl/spl_progs/new/odd.expl
+echo "linked"                               
+./expl ../spl/spl_progs/new/linked.expl
 
 cd $HOME/myexpos/xfs-interface
 ./xfs-interface run ../spl/spl_progs/new/run.sh
