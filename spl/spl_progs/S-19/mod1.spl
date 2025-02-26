@@ -24,7 +24,7 @@ if(funNo == EXIT_PROCESS) then
     call MOD_1;
 
     multipop(R1, R2);
-    [SYSTEM_STATUS_TABLE + currPID*16 + 4]=TERMINATED;
+    [PROCESS_TABLE + currPID*16 + 4]=TERMINATED;
 
     return;
 endif;
