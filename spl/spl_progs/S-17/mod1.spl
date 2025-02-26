@@ -1,6 +1,5 @@
 alias funNo R1;
 alias currPID R2;
-breakpoint;
 if(funNo == FREE_USER_AREA_PAGE)then
     //print "UPTR";
     alias userpage R6;
@@ -30,6 +29,12 @@ if(funNo == EXIT_PROCESS) then
     return;
 endif;
 if(funNo == FREE_PAGE_TABLE)then
+
+    [PTBR + 0] = -1;
+    [PTBR + 1] = "0000";
+    [PTBR + 2] = -1;
+    [PTBR + 3] = "0000";
+
     //print "free PTBR";
     alias page R7;
     alias auxilary R8;
@@ -37,16 +42,18 @@ if(funNo == FREE_PAGE_TABLE)then
     auxilary = 5;
     while(page < 20)do
 
-        //releasing the page
-        multipush(R1, R2, R7, R8);
-        R1 = RELEASE_PAGE;
-        R2 = [PAGE_TABLE_BASE + 20*currPID + page];
-        call MOD_2;
-        multipop(R1, R2, R7, R8);
+        if([PAGE_TABLE_BASE + 20*currPID + page]!=-1)then
+            //releasing the page
+            multipush(R1, R2, R7, R8);
+            R1 = RELEASE_PAGE;
+            R2 = [PAGE_TABLE_BASE + 20*currPID + page];
+            call MOD_2;
+            multipop(R1, R2, R7, R8);
 
-        //invalidating the entries in page table
-        [PAGE_TABLE_BASE + 20*currPID + page] = -1;
-        [PAGE_TABLE_BASE + 20*currPID + auxilary] = "0000";
+            //invalidating the entries in page table
+            [PAGE_TABLE_BASE + 20*currPID + page] = -1;
+            [PAGE_TABLE_BASE + 20*currPID + auxilary] = "0000";
+        endif;
         page = page + 2;
         auxilary = auxilary + 2;
 
