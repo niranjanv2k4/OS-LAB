@@ -1,0 +1,8 @@
+print "context switchs";
+print [SYSTEM_STATUS_TABLE + 26];
+print "disk access";
+print [SYSTEM_STATUS_TABLE + 25];
+print "max usage";
+print [SYSTEM_STATUS_TABLE + 27];
+
+halt;

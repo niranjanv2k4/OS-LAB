@@ -14,6 +14,8 @@ echo "disk"
 echo "console"
 ./spl ./spl_progs/new/console.spl
 
+echo "int4"
+./spl ./spl_progs/new/int4.spl
 echo "int6"
 ./spl ./spl_progs/new/int6.spl
 echo "int7"
@@ -26,6 +28,12 @@ echo "int10"
 ./spl ./spl_progs/new/int10.spl
 echo "int11"
 ./spl ./spl_progs/new/int11.spl
+echo "int13"
+./spl ./spl_progs/new/int13.spl
+echo "int14"
+./spl ./spl_progs/new/int14.spl
+echo "int15"
+./spl ./spl_progs/new/int15.spl
 
 echo "mod5"
 ./spl ./spl_progs/new/mod5.spl
@@ -53,6 +61,18 @@ echo "pid"
 ./expl ../spl/spl_progs/new/pid.expl
 echo "fork"                               
 ./expl ../spl/spl_progs/new/fork.expl
+echo "asg1"                               
+./expl ../spl/spl_progs/new/asg1.expl
+echo "parent"                               
+./expl ../spl/spl_progs/new/parent.expl
+echo "child"                               
+./expl ../spl/spl_progs/new/child.expl
+echo "sort1"                               
+./expl ../spl/spl_progs/new/sort1.expl
+echo "sort2"                               
+./expl ../spl/spl_progs/new/sort2.expl
+echo "create"                               
+./expl ../spl/spl_progs/new/create.expl
 
 cd $HOME/myexpos/xfs-interface
 ./xfs-interface run ../spl/spl_progs/new/run.sh

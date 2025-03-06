@@ -11,6 +11,10 @@ loadi(64, 14);
 loadi(65,7);
 loadi(66,8);
 
+//INT-4:create and delete
+loadi(10,23);
+loadi(11,24);
+
 //INT-6:read
 loadi(14,27);
 loadi(15,28);
@@ -19,7 +23,7 @@ loadi(15,28);
 loadi(16,29);
 loadi(17,30);
 
-//INT-7:Fork
+//INT-8:Fork
 loadi(18,31);
 loadi(19,32);
 
@@ -34,6 +38,14 @@ loadi(23,36);
 //INT-11: Wait and Signal
 loadi(24,37);
 loadi(25,38);
+
+//INT-13: Semget & Semrelease
+loadi(28,41);
+loadi(29,42);
+
+//INT-14: Semlock & Semunlock
+loadi(30,43);
+loadi(31,44);
 
 //INT-15: Shutdown
 loadi(32,45);
@@ -110,6 +122,7 @@ PTLR = 10;
 [PROCESS_TABLE + 16 + 1] = 1;
 [PROCESS_TABLE + 16 + 11] = 80;
 [PROCESS_TABLE + 16 + 4] = CREATED;
+[PROCESS_TABLE + 16 + 3] = 1;
 [PROCESS_TABLE + 16 + 13] = 8*512;
 [PROCESS_TABLE + 16 + 12] = 0;
 [PROCESS_TABLE + 16 + 14] = PAGE_TABLE_BASE + 20;
@@ -151,7 +164,7 @@ endwhile;
 [SYSTEM_STATUS_TABLE + 3] = 0;
 
 //MEM_FREE_COUNT
-[SYSTEM_STATUS_TABLE + 2] = 53;
+[SYSTEM_STATUS_TABLE + 2] = 45;
 
 //perprocess resource table
 counter = 0;
@@ -161,4 +174,29 @@ while(counter<16)do
     [init_perprocess + counter] = -1;
     counter = counter + 2;
 endwhile;
+
+//initializing semaphoretable
+counter = 0;
+while(counter < MAX_SEM_COUNT)do
+    [SEMAPHORE_TABLE + counter*4] = -1;
+    [SEMAPHORE_TABLE + counter*4 + 1] = 0;
+    counter = counter + 1;
+endwhile;
+
+counter = 0;
+while(counter < MAX_FILE_NUM)do
+    [FILE_STATUS_TABLE + counter*4] = -1;
+    [FILE_STATUS_TABLE + counter*4 + 1] = -1;
+    counter = counter + 1;
+endwhile;
+
+counter = 0;
+while(counter < 4)do
+    [BUFFER_TABLE + counter*4 + 0] = -1;
+    [BUFFER_TABLE + counter*4 + 1] = 0;
+    [BUFFER_TABLE + counter*4 + 2] = -1;
+    [BUFFER_TABLE + counter*4 + 3] = -1;
+    counter = counter + 1;
+endwhile;
+print"booted";
 return;

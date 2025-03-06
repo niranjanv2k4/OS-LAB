@@ -1,0 +1,129 @@
+alias userSP R0;
+userSP = SP;
+multipush(R0);
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 13] = SP;
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 11]* 512 - 1;
+
+alias sysNum R2;
+sysNum=[([PTBR + 2 * (userSP - 5)/512] * 512) + (userSP - 5)%512];
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) +9 ] = sysNum;
+
+alias NameOfFile R1;
+NameOfFile=[([PTBR + 2 * (userSP - 4)/512] * 512) + (userSP - 4)%512];
+
+alias permission R3;
+permission=[([PTBR + 2 * (userSP - 3)/512] * 512) + (userSP - 3)%512];
+
+alias counter R4;
+counter = 0;
+
+while(counter<60)do 
+    if([INODE_TABLE + counter*16 + 1]==NameOfFile)then
+        break;
+    endif;
+    counter = counter + 1;
+endwhile;
+
+if((sysNum == INT_DELETE && counter == 60) || (sysNum == INT_CREATE && counter != 60))then
+    multipop(R0);
+    SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 13];
+    [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) +9 ] = 0;
+    [[PTBR + (userSP - 1) * 2/512]*512 + (userSP - 1) % 512] = 0;
+    print "not present";
+    ireturn;
+endif;
+
+if(sysNum == INT_CREATE)then
+    counter = 0;
+    while(counter < MAX_FILE_NUM && [INODE_TABLE + counter*16 + 1] != -1)do
+        counter = counter + 1;
+    endwhile;
+
+    if(counter == MAX_FILE_NUM)then
+        multipop(R0);
+        [[PTBR + (userSP - 1) * 2/512]*512 + (userSP - 1) % 512] = -1;
+    else
+
+        [INODE_TABLE + counter*16 + 1] = NameOfFile;
+        [INODE_TABLE + counter*16 + 2] = 0;
+        [INODE_TABLE + counter*16 + 3] = DATA;
+        [INODE_TABLE + counter*16 + 8] = -1;
+        [INODE_TABLE + counter*16 + 9] = -1;
+        [INODE_TABLE + counter*16 + 10] = -1;
+        [INODE_TABLE + counter*16 + 11] = -1;
+        [INODE_TABLE + counter*16 + 3] = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 3];
+        [INODE_TABLE + counter*16 + 4] = permission;
+
+        [ROOT_FILE + counter*8] = NameOfFile;
+        [ROOT_FILE + counter*8 + 1] = 0;
+        [ROOT_FILE + counter*8 + 2] = DATA;
+        [ROOT_FILE + counter*8 + 3] = -1;
+        [ROOT_FILE + counter*8 + 4] = permission;
+        
+        multipop(R0);
+        [[PTBR + (userSP - 1) * 2/512]*512 + (userSP - 1) % 512] = 0;
+    endif;
+endif;
+
+if(sysNum == INT_DELETE)then
+    
+    if([INODE_TABLE + counter*16] != DATA || ([INODE_TABLE + counter*16 + 4] == 0 && [SYSTEM_STATUS_TABLE + 1] != 1 && [INODE_TABLE + counter*16 + 3] != [SYSTEM_STATUS_TABLE + 1]))then
+        multipop(R0);
+        [[PTBR + (userSP - 1) * 2/512]*512 + (userSP - 1) % 512] = -1;
+    else
+        multipush(R1, R2, R3, R4);
+        R1 = ACQUIRE_INODE;
+        R2 = [SYSTEM_STATUS_TABLE + 1];
+        R3 = counter;
+        call MOD_0;
+        multipop(R1, R2, R3, R4);
+
+        if([FILE_STATUS_TABLE + counter*4 + 1] != -1)then
+            
+            multipush(R1, R2, R3, R4);
+            R1 = RELEASE_INODE;
+            R2 = [SYSTEM_STATUS_TABLE + 1];
+            R3 = counter;
+            call MOD_0;
+            multipop(R1, R2, R3, R4);
+
+            multipop(R0);
+            [[PTBR + (userSP - 1) * 2/512]*512 + (userSP - 1) % 512] = -1;
+            print "denied";
+        else
+            alias index R5;
+            index = 0;
+            while(index < 4)do
+                if([INODE_TABLE + counter*16 + 8 + index] != -1)then
+
+                    multipush(R1, R2, R3, R4, R5);
+                    R1 = RELEASE_BLOCK;
+                    R2 = [INODE_TABLE + counter*16 + index];
+                    call MOD_2;
+                    multipop(R1, R2, R3, R4, R5);
+
+                endif;
+                index = index + 1;
+            endwhile;
+
+            [INODE_TABLE + counter*16 + 1] = -1;
+            [ROOT_FILE + counter*8] = -1;
+
+            multipush(R1, R2, R3, R4);
+            R1 = RELEASE_INODE;
+            R2 = [SYSTEM_STATUS_TABLE + 1];
+            R3 = counter;
+            call MOD_0;
+            multipop(R1, R2, R3, R4);
+        endif;
+
+        multipop(R0);
+        [[PTBR + (userSP - 1) * 2/512]*512 + (userSP - 1) % 512] = 0;
+    endif;
+endif;
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) +9 ] = 0;
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 13];
+ireturn;
