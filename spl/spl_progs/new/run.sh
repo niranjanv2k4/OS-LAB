@@ -23,12 +23,7 @@ load --exhandler $HOME/myexpos/spl/spl_progs/new/exception.xsm
 load --library $HOME/myexpos/expl/library.lib
 load --idle $HOME/myexpos/spl/spl_progs/new/idle.xsm
 load --init $HOME/myexpos/spl/spl_progs/new/shell.xsm
-load --exec $HOME/myexpos/spl/spl_progs/new/odd.xsm
-load --exec $HOME/myexpos/spl/spl_progs/new/even.xsm
-load --exec $HOME/myexpos/spl/spl_progs/new/linked.xsm
 load --exec $HOME/myexpos/spl/spl_progs/new/pid.xsm
 load --exec $HOME/myexpos/spl/spl_progs/new/fork.xsm
-load --exec $HOME/myexpos/spl/spl_progs/new/asg1.xsm
-load --exec $HOME/myexpos/spl/spl_progs/new/parent.xsm
-load --exec $HOME/myexpos/spl/spl_progs/new/child.xsm
 load --exec $HOME/myexpos/spl/spl_progs/new/create.xsm
+load --exec $HOME/myexpos/spl/spl_progs/new/delete.xsm
