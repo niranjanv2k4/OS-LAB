@@ -1,0 +1,144 @@
+alias funNum R1;
+if(funNum == BUFFERED_READ)then
+
+    alias blockNum R2;
+    alias offset R3;
+    alias memAdd R4;
+
+    alias buffNum R5;
+    buffNum = blockNum%MAX_BUFFER;
+
+    multipush(R1, R2, R3, R4, R5);
+    R1 = ACQUIRE_BUFFER;
+    R2 = [SYSTEM_STATUS_TABLE + 1];
+    R3 = buffNum;
+    call MOD_0;
+    multipop(R1, R2, R3, R4, R5);
+    
+    if([BUFFER_TABLE + buffNum*4 + 0] != blockNum)then
+
+        if([BUFFER_TABLE + buffNum*4 + 1] == 1)then
+            multipush(R1, R2, R3, R4, R5);
+            R1 = DISK_STORE;
+            R2 = [SYSTEM_STATUS_TABLE + 1];
+            R3 = 71 + buffNum;
+            R4 = [BUFFER_TABLE + buffNum*4 + 0];
+            call MOD_4;
+            multipop(R1,R2, R3, R4, R5);
+        endif;
+
+        [BUFFER_TABLE + buffNum*4 + 1] = 0;
+
+        multipush(R1, R2, R3, R4, R5);
+        R1 = DISK_LOAD;
+        R4 = blockNum;
+        R2 = [SYSTEM_STATUS_TABLE + 1];
+        R3 = 71 + buffNum;
+        call MOD_4;
+        multipop(R1,R2, R3, R4, R5);
+
+        [BUFFER_TABLE + buffNum*4 + 0] = blockNum;
+
+    endif;
+    
+    [memAdd] = [(71 + buffNum)*512 + offset];
+    multipush(R1, R2, R3, R4, R5);
+    R1 = RELEASE_BUFFER;
+    R2 = [SYSTEM_STATUS_TABLE + 1];
+    R3 = buffNum;
+    call MOD_0;
+    multipop(R1, R2, R3, R4, R5);
+
+    return;
+endif;
+
+if(funNum == CLOSE)then
+    alias inodeIndex R4;
+    alias fileIndex R2;
+    inodeIndex = [OPEN_FILE_TABLE + fileIndex*4 + 0];
+    [OPEN_FILE_TABLE + fileIndex*4 + 1] = [OPEN_FILE_TABLE + fileIndex*4 + 1] - 1;
+
+    if([OPEN_FILE_TABLE + fileIndex*4 + 1] == 0)then
+        [OPEN_FILE_TABLE + fileIndex*4 + 0] = -1;
+        [OPEN_FILE_TABLE + fileIndex*4 + 1] = -1;
+        [OPEN_FILE_TABLE + fileIndex*4 + 2] = -1;
+        [OPEN_FILE_TABLE + fileIndex*4 + 3] = -1;
+        if(inodeIndex != INODE_ROOT)then
+            [FILE_STATUS_TABLE + inodeIndex*4 + 1] = [FILE_STATUS_TABLE + inodeIndex*4 + 1] - 1;
+            if([FILE_STATUS_TABLE + inodeIndex*4 + 1] == 0)then
+                [FILE_STATUS_TABLE + inodeIndex*4 + 1] = -1;
+            endif;
+        endif;
+    endif;  
+endif;
+
+if(funNum == OPEN)then
+
+    alias inodeIndex R5;
+    alias FileName R2;
+
+    inodeIndex = 0;
+    while(inodeIndex < MAX_FILE_NUM && [INODE_TABLE + inodeIndex*16 + 1] != FileName)do
+        inodeIndex = inodeIndex + 1;
+    endwhile;
+
+    if(inodeIndex == MAX_FILE_NUM)then
+        R0 = -1;
+        return;
+    endif;
+    
+    multipush(R0, R1, R2, R3, R4, R5);
+    R1 = ACQUIRE_INODE;
+    R2 = [SYSTEM_STATUS_TABLE + 1];
+    R3 = inodeIndex;
+    call MOD_0;
+    R10 = R0;
+    multipop(R0, R1, R2, R3, R4, R5);
+
+    if(R10 == -1)then
+        R0 = -1;
+        breakpoint;
+    else
+        if([INODE_TABLE + inodeIndex*16 + 0] == EXEC)then
+            R0 = -1;
+        else
+            alias fileIndex R6;
+            fileIndex = 0;
+            while(fileIndex < MAX_OPENFILE_NUM)do
+                if([OPEN_FILE_TABLE + fileIndex*4 + 0] == -1)then
+                    break;
+                endif;
+                fileIndex = fileIndex + 1;
+            endwhile;
+
+            if(fileIndex == MAX_OPENFILE_NUM)then
+                R0 = -2;
+            else
+                if(FileName =="root")then
+                    [OPEN_FILE_TABLE + fileIndex*4 + 0] = INODE_ROOT;
+                else
+                    if([FILE_STATUS_TABLE + inodeIndex*4 + 1] == -1)then
+                        [FILE_STATUS_TABLE + inodeIndex*4 + 1] = 1;
+                    else
+                        [FILE_STATUS_TABLE + inodeIndex*4 + 1] = [FILE_STATUS_TABLE + inodeIndex*4 + 1] + 1;
+                    endif;
+                    [OPEN_FILE_TABLE + fileIndex*4 + 0] = inodeIndex;
+                endif;
+
+                [OPEN_FILE_TABLE + fileIndex*4 + 1] = 1;
+                [OPEN_FILE_TABLE + fileIndex*4 + 2] = 0;
+                
+                R0 = fileIndex;
+            endif;
+        endif;
+    endif;
+    
+    multipush(R0, R1, R2, R3, R4, R5);
+    R1 = RELEASE_INODE;
+    R2 = [SYSTEM_STATUS_TABLE + 1];
+    R3 = inodeIndex;
+    call MOD_0;
+    R10 = R0;
+    multipop(R0, R1, R2, R3, R4, R5);
+endif;
+return;

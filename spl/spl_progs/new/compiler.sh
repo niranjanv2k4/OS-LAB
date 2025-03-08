@@ -16,6 +16,8 @@ echo "console"
 
 echo "int4"
 ./spl ./spl_progs/new/int4.spl
+echo "int5"
+./spl ./spl_progs/new/int5.spl
 echo "int6"
 ./spl ./spl_progs/new/int6.spl
 echo "int7"
@@ -39,6 +41,8 @@ echo "mod5"
 ./spl ./spl_progs/new/mod5.spl
 echo "mod4"
 ./spl ./spl_progs/new/mod4.spl
+echo "mod3"
+./spl ./spl_progs/new/mod3.spl
 echo "mod2"
 ./spl ./spl_progs/new/mod2.spl
 echo "mod1"
@@ -59,6 +63,10 @@ echo "create"
 ./expl ../spl/spl_progs/new/create.expl
 echo "delete"                               
 ./expl ../spl/spl_progs/new/delete.expl
+echo "assg1"                               
+./expl ../spl/spl_progs/new/assg1.expl
+echo "assg2"                               
+./expl ../spl/spl_progs/new/assg2.expl
 
 cd $HOME/myexpos/xfs-interface
 ./xfs-interface run ../spl/spl_progs/new/run.sh

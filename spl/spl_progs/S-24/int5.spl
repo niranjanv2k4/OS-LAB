@@ -1,0 +1,83 @@
+alias userSP R9;
+userSP = SP;
+
+alias sysNum R10;
+sysNum = [[PTBR + 2*(userSP - 5)/512] * 512 + (userSP - 5)%512];
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 9] = sysNum;
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 13] = SP;
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 11]* 512 - 1;
+
+//OPEN SYSCALL
+if(sysNum == 2)then
+
+    alias processTable R3;
+    processTable = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 + RESOURCE_TABLE_OFFSET;
+
+    alias processTableEntry R4;
+    processTableEntry = 0;
+
+    while(processTableEntry < 8)do
+        if([processTable + 2*processTableEntry] == -1)then
+            break;
+        endif;
+        processTableEntry = processTableEntry + 1;
+    endwhile;
+
+    if(processTableEntry == 8)then
+        [[PTBR + 2*(userSP - 1)/512]*512 + (userSP - 1)%512] = -3;
+    else
+
+        multipush(R3, R9, R10);
+        R1 = OPEN;
+        R2 = [[PTBR + 2*(userSP - 4)/512] * 512 + (userSP - 4)%512];
+        call MOD_3;
+        multipop(R3, R9, R10);
+
+        if(R0 < 0)then
+            [[PTBR + 2*(userSP - 1)/512]*512 + (userSP - 1)%512] = R0;
+        else
+            [processTable + processTableEntry*2] = FILE;
+            [processTable + processTableEntry*2 + 1] = R0;
+            [[PTBR + 2*(userSP - 1)/512]*512 + (userSP - 1)%512] = 0;
+        endif;
+    endif;
+endif;  
+
+
+//CLOSE SYSCALL
+if(sysNum == 3)then
+
+    alias fileDescriptor R2;
+    fileDescriptor = [[PTBR + 2*(userSP - 4)/512] * 512 + (userSP - 4)%512];
+
+    if(R3 <0 || R3 > 7)then
+        [[PTBR + 2*(userSP - 4)/512] * 512 + (userSP - 4)%512] = -1;
+    else
+
+        alias processTable R3;
+        processTable = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 + RESOURCE_TABLE_OFFSET;
+
+        if([processTable + fileDescriptor*2] != FILE)then
+            [[PTBR + 2*(userSP - 4)/512] * 512 + (userSP - 4)%512] = -1;
+        else
+            alias fileIndex R4;
+            fileIndex = [processTable + fileDescriptor*2 + 1];
+
+            multipush(R2, R3, R4);
+            R1 = CLOSE;
+            R2 = fileIndex;
+            call MOD_3;
+            multipop(R2, R3, R4);
+
+            [processTable + fileDescriptor*2] = -1;
+            [[PTBR + 2*(userSP - 4)/512] * 512 + (userSP - 4)%512] = 0;
+        endif;
+        
+    endif;
+endif;
+
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 9] = 0;
+
+ireturn;

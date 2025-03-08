@@ -11,9 +11,8 @@ alias NameOfFile R1;
 NameOfFile=[([PTBR + 2 * (userSP - 4)/512] * 512) + (userSP - 4)%512];
 
 alias inode_index R2;
-alias flag R3;
-flag = 0;
 inode_index = 0;
+
 while(inode_index<60)do 
     if([INODE_TABLE + inode_index*16 + 1]==NameOfFile)then
         break;
@@ -113,4 +112,5 @@ endwhile;
 [[PTBR +16]*512] = [[PTBR + 8]*512 + 1];
 [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) +9 ] = 0;
 SP = 8*512;
+
 ireturn;

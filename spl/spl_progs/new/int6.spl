@@ -6,36 +6,95 @@ userSP = SP;
 [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 13] = SP;
 SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 11]* 512 - 1;
 
-alias physicalPageNum R1;
-alias offset R2;
-alias fileDescPhysicalAddr R3;
+alias fileDescriptor R1;
+fileDescriptor=[[PTBR + 2 * (userSP - 4)/512]*512 + (userSP - 4)%512];
 
-physicalPageNum = [PTBR + 2 * (userSP - 4)/512];
-offset = (userSP - 4)%512;
-fileDescPhysicalAddr = (physicalPageNum * 512) + offset;
+if(fileDescriptor == -1)then
 
-alias fileDescriptor R4;
-fileDescriptor=[fileDescPhysicalAddr];
-
-if(fileDescriptor != -1)then
-    alias physicalAddrRetVal R5;
-	physicalAddrRetVal = ([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512);
-	[physicalAddrRetVal] = -1;
-else
     alias word R5;
     word = [([PTBR + 2 * ((userSP - 3) / 512)] * 512) + ((userSP - 3) % 512)];
-    multipush(R0, R1, R2, R3);
 
+    multipush(R0, R1, R2, R5);
     R1 = 4;
     R2 = [SYSTEM_STATUS_TABLE + 1];
     R3 = word;
     call MOD_4;
+    multipop(R0, R1, R2, R5);
+	
+    [[PTBR + 2 * (userSP - 1) / 512] * 512 + (userSP - 1) % 512] = 0;
+else
+    
+    if(fileDescriptor   <0 && fileDescriptor>7)then
+        [[PTBR + 2 * (userSP - 1) / 512] * 512 + (userSP - 1) % 512] = -1;
+    else
+        alias resourceTableEntry R2;
+        resourceTableEntry = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 + RESOURCE_TABLE_OFFSET + fileDescriptor*2;
+        
+        if([resourceTableEntry + 0] != FILE)then
+            [[PTBR + 2 * (userSP - 1) / 512] * 512 + (userSP - 1) % 512] = -1;
+        else
+           
+            alias openFileTable R5;
+            openFileTable = [resourceTableEntry + 1];
 
-    multipop(R0, R1, R2, R3);
+            alias inodeIndex R4;
+            inodeIndex = [OPEN_FILE_TABLE + openFileTable*4 + 0];
 
-    alias physicalAddrRetVal R6;
-	physicalAddrRetVal = ([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512);
-	[physicalAddrRetVal] = 0;
+
+            multipush(R0, R1, R2, R3, R4, R5);
+            R1 = ACQUIRE_INODE;
+            R2 = [SYSTEM_STATUS_TABLE + 1];
+            R3 = inodeIndex;
+            call MOD_0;
+            R10 = R0;
+            multipop(R0, R1, R2, R3, R4, R5);
+
+            if(R10 == -1)then
+                [[PTBR + 2 * (userSP - 1) / 512] * 512 + (userSP - 1) % 512] = -1;
+            else
+                alias lSeek R7;
+                lSeek = OPEN_FILE_TABLE + openFileTable*4 + 2;
+                alias logAdd R8;
+                logAdd = [PTBR + 2*(userSP - 3)/512]*512 + (userSP - 3)%512;
+
+                alias phyAdd R9;
+                phyAdd = [PTBR + 2*[logAdd]/512]*512 + [logAdd]%512;
+
+                if(inodeIndex == INODE_ROOT)then
+                    if([lSeek] == 480)then
+                        [[PTBR + 2 * (userSP - 1) / 512] * 512 + (userSP - 1) % 512] = -2;
+                    else
+                        [phyAdd] = [ROOT_FILE + [lSeek]];
+                        [lSeek] = [lSeek] + 1;
+                        [[PTBR + 2 * (userSP - 1) / 512] * 512 + (userSP - 1) % 512] = 0;
+                    endif;
+                else
+                    if([lSeek] == [INODE_TABLE + inodeIndex*16 + 2])then
+                        [[PTBR + 2 * (userSP - 1) / 512] * 512 + (userSP - 1) % 512] = -2;
+                    else
+
+                        multipush(R0, R1, R2, R3, R4, R5, R6, R7, R8, R9);
+                        R1 = BUFFERED_READ;
+                        R2 = [INODE_TABLE + inodeIndex*16 + 8 + [lSeek]/512];
+                        R3 = [lSeek]%512;
+                        R4 = phyAdd;
+                        call MOD_3;
+                        multipop(R0, R1, R2, R3, R4, R5, R6, R7, R8, R9);
+                        [lSeek] = [lSeek] + 1;
+                        [[PTBR + 2 * (userSP - 1) / 512] * 512 + (userSP - 1) % 512] = 0;
+                    endif;
+                endif;
+            endif;
+            multipush(R0, R1, R2, R3, R4, R5);
+            R1 = RELEASE_INODE;
+            R2 = [SYSTEM_STATUS_TABLE + 1];
+            R3 = inodeIndex;
+            call MOD_0;
+            R10 = R0;
+            multipop(R0, R1, R2, R3, R4, R5);
+
+        endif;
+    endif;
 endif;
 
 
