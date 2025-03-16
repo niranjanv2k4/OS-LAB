@@ -44,7 +44,7 @@ if(sysNum == 14)then                          //SIGNAL
     alias counter R11;
     counter = 0;
     while(counter < 16)do
-        if([PROCESS_TABLE + counter*16 + 4] == WAIT_PROCESS && [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 5] == [SYSTEM_STATUS_TABLE + 1])then
+        if([PROCESS_TABLE + counter*16 + 4] == WAIT_PROCESS && [PROCESS_TABLE + counter*16 + 5] == [SYSTEM_STATUS_TABLE + 1])then
             [PROCESS_TABLE + counter*16 + 4] = READY;
         endif;
         counter = counter + 1;

@@ -56,7 +56,7 @@ else
 
     if(sysNum == INT_DELETE)then
         
-        if([INODE_TABLE + counter*16] != DATA || ([INODE_TABLE + counter*16 + 4] == EXCLUSIVE && [SYSTEM_STATUS_TABLE + 1] != 1 && [INODE_TABLE + counter*16 + 3] != [SYSTEM_STATUS_TABLE + 1]))then
+        if([INODE_TABLE + counter*16] != DATA || ([INODE_TABLE + counter*16 + 4] == EXCLUSIVE && [SYSTEM_STATUS_TABLE + 1] != 1 && [INODE_TABLE + counter*16 + 3] != [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 3]))then
             [[PTBR + (userSP - 1) * 2/512]*512 + (userSP - 1) % 512] = -1;
         else
             multipush(R0, R1, R2, R3, R4);

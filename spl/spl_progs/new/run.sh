@@ -22,13 +22,28 @@ load --int=14 $HOME/myexpos/spl/spl_progs/new/int14.xsm
 load --int=15 $HOME/myexpos/spl/spl_progs/new/int15.xsm
 load --exhandler $HOME/myexpos/spl/spl_progs/new/exception.xsm
 load --library $HOME/myexpos/expl/library.lib
-fdisk
 load --data $HOME/myexpos/numbers.dat
 load --idle $HOME/myexpos/spl/spl_progs/new/idle.xsm
 load --init $HOME/myexpos/spl/spl_progs/new/shell.xsm
+rm pid.xsm
+rm fork.xsm
+rm create.xsm
+rm delete.xsm
+rm odd.xsm
+rm even.xsm
+rm sort1.xsm
+rm assg1.xsm
+rm assg2.xsm
+rm assg3.xsm
+rm assg4.xsm
 load --exec $HOME/myexpos/spl/spl_progs/new/pid.xsm
 load --exec $HOME/myexpos/spl/spl_progs/new/fork.xsm
 load --exec $HOME/myexpos/spl/spl_progs/new/create.xsm
 load --exec $HOME/myexpos/spl/spl_progs/new/delete.xsm
+load --exec $HOME/myexpos/spl/spl_progs/new/odd.xsm
+load --exec $HOME/myexpos/spl/spl_progs/new/even.xsm
+load --exec $HOME/myexpos/spl/spl_progs/new/sort1.xsm
 load --exec $HOME/myexpos/spl/spl_progs/new/assg1.xsm
 load --exec $HOME/myexpos/spl/spl_progs/new/assg2.xsm
+load --exec $HOME/myexpos/spl/spl_progs/new/assg3.xsm
+load --exec $HOME/myexpos/spl/spl_progs/new/assg4.xsm

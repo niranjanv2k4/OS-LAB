@@ -61,12 +61,22 @@ echo "fork"
 ./expl ../spl/spl_progs/new/fork.expl
 echo "create"                               
 ./expl ../spl/spl_progs/new/create.expl
+echo "odd"                               
+./expl ../spl/spl_progs/new/odd.expl
+echo "even"                               
+./expl ../spl/spl_progs/new/even.expl
+echo "sort1"                               
+./expl ../spl/spl_progs/new/sort1.expl
 echo "delete"                               
 ./expl ../spl/spl_progs/new/delete.expl
 echo "assg1"                               
 ./expl ../spl/spl_progs/new/assg1.expl
 echo "assg2"                               
 ./expl ../spl/spl_progs/new/assg2.expl
+echo "assg3"                               
+./expl ../spl/spl_progs/new/assg3.expl
+echo "assg4"                               
+./expl ../spl/spl_progs/new/assg4.expl
 
 cd $HOME/myexpos/xfs-interface
 ./xfs-interface run ../spl/spl_progs/new/run.sh

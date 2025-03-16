@@ -9,6 +9,7 @@ int main() {
         temp = exposcall("Write", -2, "Permission:");
         temp = exposcall("Read", -1, permission);
         temp = exposcall("Create", file, permission);
+        breakpoint;
         return 0;
     end
 }

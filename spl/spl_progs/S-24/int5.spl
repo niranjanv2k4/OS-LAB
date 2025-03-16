@@ -51,15 +51,15 @@ if(sysNum == 3)then
     alias fileDescriptor R2;
     fileDescriptor = [[PTBR + 2*(userSP - 4)/512] * 512 + (userSP - 4)%512];
 
-    if(R3 <0 || R3 > 7)then
-        [[PTBR + 2*(userSP - 4)/512] * 512 + (userSP - 4)%512] = -1;
+    if(fileDescriptor <0 || fileDescriptor > 7)then
+        [[PTBR + 2*(userSP - 1)/512] * 512 + (userSP - 1)%512] = -1;
     else
 
         alias processTable R3;
         processTable = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 + RESOURCE_TABLE_OFFSET;
 
         if([processTable + fileDescriptor*2] != FILE)then
-            [[PTBR + 2*(userSP - 4)/512] * 512 + (userSP - 4)%512] = -1;
+            [[PTBR + 2*(userSP - 1)/512] * 512 + (userSP - 1)%512] = -1;
         else
             alias fileIndex R4;
             fileIndex = [processTable + fileDescriptor*2 + 1];
@@ -71,7 +71,7 @@ if(sysNum == 3)then
             multipop(R2, R3, R4);
 
             [processTable + fileDescriptor*2] = -1;
-            [[PTBR + 2*(userSP - 4)/512] * 512 + (userSP - 4)%512] = 0;
+            [[PTBR + 2*(userSP - 1)/512] * 512 + (userSP - 1)%512] = 0;
         endif;
         
     endif;

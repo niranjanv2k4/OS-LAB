@@ -19,6 +19,7 @@ if(sysNum == INT_SEMGET)then
     call MOD_0;
 
     if(R0 == -1)then
+        multipop(R0);
         [[PTBR + 2 * ((userSP - 1) / 512)] * 512 + ((userSP - 1) % 512)] = -2;
     else
 

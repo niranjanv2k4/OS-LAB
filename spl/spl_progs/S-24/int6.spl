@@ -24,7 +24,7 @@ if(fileDescriptor == -1)then
     [[PTBR + 2 * (userSP - 1) / 512] * 512 + (userSP - 1) % 512] = 0;
 else
     
-    if(fileDescriptor   <0 && fileDescriptor>7)then
+    if(fileDescriptor<0 || fileDescriptor>7)then
         [[PTBR + 2 * (userSP - 1) / 512] * 512 + (userSP - 1) % 512] = -1;
     else
         alias resourceTableEntry R2;
