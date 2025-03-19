@@ -77,6 +77,14 @@ echo "assg3"
 ./expl ../spl/spl_progs/S-25/assg3.expl
 echo "assg4"                               
 ./expl ../spl/spl_progs/S-25/assg4.expl
+echo "cat"                               
+./expl ../spl/spl_progs/S-25/cat.expl
+echo "ls"                               
+./expl ../spl/spl_progs/S-25/ls.expl
+echo "cp"                               
+./expl ../spl/spl_progs/S-25/cp.expl
+echo "rm"                               
+./expl ../spl/spl_progs/S-25/rm.expl
 
 cd $HOME/myexpos/xfs-interface
 ./xfs-interface run ../spl/spl_progs/S-25/run.sh

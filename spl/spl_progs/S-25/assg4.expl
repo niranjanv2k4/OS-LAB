@@ -12,7 +12,7 @@ int store(str file, int start)
 
   begin
     //Create and open the file
-    x=exposcall("Create", file, 1);
+    x=exposcall("Create", file);
     fp=exposcall("Open", file, 1);
 
     //Store the numbers into the file
@@ -89,7 +89,8 @@ int merge(str out, str in1, str in2)
     //Delete the input files
     x=exposcall("Delete", in1);
     x=exposcall("Delete", in2);
-    write("Done");
+
+    write("Merged");
     return 0;
   end
 }
@@ -108,7 +109,7 @@ int main()
         //Store the numbers into "temp1.dat"
         x=store("temp1.dat", 1);
 
-        //x=exposcall("Wait", pid2);
+        x=exposcall("Wait", pid2);
       else
         //Store the numbers into "temp2.dat"
         x=store("temp2.dat", 2);
@@ -119,14 +120,14 @@ int main()
       //Merge "temp1.dat" and "temp2.dat" into "tempa.dat"
       x=merge("tempa.dat", "temp1.dat", "temp2.dat");
 
-      //x=exposcall("Wait", pid1);
+      x=exposcall("Wait", pid1);
     else
       pid2=exposcall("Fork");
       if(pid2!=0) then
         //Store the numbers into "temp3.dat"
         x=store("temp3.dat", 3);
 
-        //x=exposcall("Wait", pid2);
+        x=exposcall("Wait", pid2);
       else
         //Store the numbers into "temp4.dat"
         x=store("temp4.dat", 4);
@@ -136,7 +137,7 @@ int main()
 
       //Merge "temp3.dat" and "temp4.dat" into "tempb.dat"
       x=merge("tempb.dat", "temp3.dat", "temp4.dat");
-
+      
       x=exposcall("Exit");
     endif;
 

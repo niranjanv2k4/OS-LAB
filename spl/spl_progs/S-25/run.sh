@@ -36,6 +36,10 @@ rm assg1.xsm
 rm assg2.xsm
 rm assg3.xsm
 rm assg4.xsm
+rm cat.xsm
+rm cp.xsm
+rm ls.xsm
+rm rm.xsm
 load --exec $HOME/myexpos/spl/spl_progs/S-25/pid.xsm
 load --exec $HOME/myexpos/spl/spl_progs/S-25/fork.xsm
 load --exec $HOME/myexpos/spl/spl_progs/S-25/create.xsm
@@ -47,3 +51,7 @@ load --exec $HOME/myexpos/spl/spl_progs/S-25/assg1.xsm
 load --exec $HOME/myexpos/spl/spl_progs/S-25/assg2.xsm
 load --exec $HOME/myexpos/spl/spl_progs/S-25/assg3.xsm
 load --exec $HOME/myexpos/spl/spl_progs/S-25/assg4.xsm
+load --exec $HOME/myexpos/spl/spl_progs/S-25/cat.xsm
+load --exec $HOME/myexpos/spl/spl_progs/S-25/cp.xsm
+load --exec $HOME/myexpos/spl/spl_progs/S-25/ls.xsm
+load --exec $HOME/myexpos/spl/spl_progs/S-25/rm.xsm
