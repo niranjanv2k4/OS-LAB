@@ -1,0 +1,245 @@
+//Loading the expos library
+loadi(63, 13);
+loadi(64, 14);
+
+//INT-4:Create and Delete
+loadi(10,23);
+loadi(11,24);
+
+//INT-5:Open and Close
+loadi(12,25);
+loadi(13,26);
+
+//INT-6:read
+loadi(14,27);
+loadi(15,28);
+
+//INT-7:write
+loadi(16,29);
+loadi(17,30);
+
+//INT-8:Fork
+loadi(18,31);
+loadi(19,32);
+
+//INT-9:Exec
+loadi(20, 33);
+loadi(21, 34);
+
+//INT-10: exit
+loadi(22,35);
+loadi(23,36);
+
+//INT-11: Wait and Signal
+loadi(24,37);
+loadi(25,38);
+
+//INT-12: Logout
+loadi(26,39);
+loadi(27,40);
+
+//INT-13: Semget & Semrelease
+loadi(28,41);
+loadi(29,42);
+
+//INT-14: Semlock & Semunlock
+loadi(30,43);
+loadi(31,44);
+
+//INT-15: Shutdown
+loadi(32,45);
+loadi(33,46);
+
+//INT-16: Shutdown
+loadi(34,47);
+loadi(35,48);
+
+//INT-17: login
+loadi(36,49);
+loadi(37,50);
+
+//Loading the exeption handler
+loadi(2, 15);
+loadi(3, 16);
+
+//timer interrupt
+loadi(4, 17);
+loadi(5, 18);
+
+//disk interrupt
+loadi(6, 19);
+loadi(7, 20);
+
+//console interrupt
+loadi(8, 21);
+loadi(9, 22);
+
+//module 0:resource manager
+loadi(40, 53);
+loadi(41, 54);
+
+//module 1: Process manager
+loadi(42, 55);
+loadi(43, 56);
+
+//module 2: Memory manager
+loadi(44, 57);
+loadi(45, 58);
+
+//module 3: Memory manager
+loadi(46, 59);
+loadi(47, 60);
+
+//module 4: Device manager
+loadi(48, 61);
+loadi(49, 62);
+
+//module 5: scheduler
+loadi(50, 63);
+loadi(51, 64);
+
+//inode + user table 
+loadi(59, 3);
+loadi(60, 4);
+
+// root file
+loadi(62, 5);
+
+// disk free list
+loadi(61, 2);
+
+//Loading the INIT program
+loadi(65,7);
+
+//PT FOR INIT
+PTBR = PAGE_TABLE_BASE + 20;
+PTLR = 10;
+
+[PTBR+0] = 63;
+[PTBR+1] = "0100";
+[PTBR+2] = 64;
+[PTBR+3] = "0100";
+
+[PTBR+4] = -1;
+[PTBR+5] = "0000";
+[PTBR+6] = -1;
+[PTBR+7] = "0000";
+
+[PTBR+8] = 65;
+[PTBR+9] = "0100";
+[PTBR+10] = -1;
+[PTBR+11] = "0000";
+[PTBR+12] = -1;
+[PTBR+13] = "0000";
+[PTBR+14] = -1;
+[PTBR+15] = "0000";
+
+[PTBR+16] = 66;
+[PTBR+17] = "0110";
+[PTBR+18] = -1;
+[PTBR+19] = "0000";
+
+[PROCESS_TABLE + 16 + 1] = 1;
+[PROCESS_TABLE + 16 + 11] = 77;
+[PROCESS_TABLE + 16 + 4] = CREATED;
+[PROCESS_TABLE + 16 + 3] = 1;
+[PROCESS_TABLE + 16 + 13] = 8*512;
+[PROCESS_TABLE + 16 + 12] = 0;
+[PROCESS_TABLE + 16 + 14] = PAGE_TABLE_BASE + 20;
+[PROCESS_TABLE + 16 + 15] = 10;
+[66*512] = [65*512 + 1];
+
+//setting all other to terminated
+[PROCESS_TABLE + 3*16 + 4] = TERMINATED;
+[PROCESS_TABLE + 4*16 + 4] = TERMINATED;
+[PROCESS_TABLE + 5*16 + 4] = TERMINATED;
+[PROCESS_TABLE + 6*16 + 4] = TERMINATED;
+[PROCESS_TABLE + 7*16 + 4] = TERMINATED;
+[PROCESS_TABLE + 8*16 + 4] = TERMINATED;
+[PROCESS_TABLE + 9*16 + 4] = TERMINATED;
+[PROCESS_TABLE + 10*16 + 4] = TERMINATED;
+[PROCESS_TABLE + 11*16 + 4] = TERMINATED;
+[PROCESS_TABLE + 12*16 + 4] = TERMINATED;
+[PROCESS_TABLE + 13*16 + 4] = TERMINATED;
+[PROCESS_TABLE + 14*16 + 4] = TERMINATED;
+[PROCESS_TABLE + 15*16 + 4] = TERMINATED;
+
+[TERMINAL_STATUS_TABLE]=0;
+[DISK_STATUS_TABLE] = 0;
+
+alias counter R10;
+
+//perprocess resource table
+counter = 0;
+alias initPerprocess R3;
+initPerprocess = [PROCESS_TABLE + 16 + 11]*512 + RESOURCE_TABLE_OFFSET;
+while(counter<16)do
+    [initPerprocess + counter] = -1;
+    counter = counter + 2;
+endwhile;
+
+//Shell program
+loadi(67, 9);
+loadi(68, 10);
+
+PTBR = PAGE_TABLE_BASE + 2*20;
+
+[PTBR + 0] = 63;
+[PTBR + 1] = "0100";
+[PTBR + 2] = 64;
+[PTBR + 3] ="0100";
+[PTBR + 4] = -1;
+[PTBR + 5] = "0000";
+[PTBR + 6] = -1;
+[PTBR + 7] = "0000";
+
+[PTBR + 8] = 67;
+[PTBR + 9] = "0100";
+[PTBR + 10] = 68;
+[PTBR + 11] = "0100";
+[PTBR + 12] = -1;
+[PTBR + 13] = "0000";
+[PTBR + 14] = -1;
+[PTBR + 15] = "0000";
+
+[PTBR + 16] = 78;
+[PTBR + 17] = "0110";
+[PTBR + 18] = 79;
+[PTBR + 19] = "0110";
+
+counter=0;
+while(counter<128)do
+    if(counter<81)then
+        [MEMORY_FREE_LIST + counter] = 1;
+    else
+        [MEMORY_FREE_LIST + counter] = 0;
+    endif;
+
+    if(counter < MAX_FILE_NUM)then
+        [FILE_STATUS_TABLE + counter*4] = -1;
+        [FILE_STATUS_TABLE + counter*4 + 1] = -1;
+
+        if(counter < 32)then
+
+            [OPEN_FILE_TABLE + counter*4 + 0] = -1;
+            [OPEN_FILE_TABLE + counter*4 + 1] = 0;
+
+            [SEMAPHORE_TABLE + counter*4] = -1;
+            [SEMAPHORE_TABLE + counter*4 + 1] = 0;
+
+            if(counter < 4)then
+                [BUFFER_TABLE + counter*4 + 0] = -1;
+                [BUFFER_TABLE + counter*4 + 1] = 0;
+                [BUFFER_TABLE + counter*4 + 2] = -1;
+                [BUFFER_TABLE + counter*4 + 3] = -1;
+            endif;
+        endif;
+    endif;
+
+    counter = counter + 1;
+endwhile;
+
+[SYSTEM_STATUS_TABLE + 3] = 0;
+[SYSTEM_STATUS_TABLE + 2] = 47;
+breakpoint;
+return;

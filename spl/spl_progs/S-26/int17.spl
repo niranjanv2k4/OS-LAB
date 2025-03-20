@@ -1,0 +1,55 @@
+alias userSP R0;
+userSP = SP;
+
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = INT_LOGIN;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13] = SP;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 11]* 512 - 1;
+
+alias returnAdd R1;
+alias userName R2;
+alias passWord R3;
+
+returnAdd = [PTBR + 2*(userSP - 1)/512]*512 + (userSP - 1)%512;
+passWord = [[PTBR + 2*(userSP - 3)/512]*512 + (userSP - 3)%512];
+userName = [[PTBR + 2*(userSP - 4)/512]*512 + (userSP - 4)%512];
+
+if([SYSTEM_STATUS_TABLE + 1] != 1)then
+    [returnAdd] = -2;
+    goto exit;
+endif;
+
+alias userTableEntry R4;
+userTableEntry = 0;
+while(userTableEntry < MAX_USER_NUM && [USER_TABLE + 2*userTableEntry] != userName)do
+    userTableEntry = userTableEntry + 1;
+endwhile;
+
+if(userTableEntry == MAX_USER_NUM)then
+    [returnAdd] = -1;
+    goto exit;
+endif;
+
+encrypt passWord;
+
+if([USER_TABLE + 2*userTableEntry + 1] != passWord)then
+    [returnAdd] = -1;
+    goto exit;
+endif;
+
+[PROCESS_TABLE + 2*16 + 4] = CREATED;
+[PROCESS_TABLE + 2*16 + 3] = userTableEntry;
+
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 4] = WAIT_PROCESS;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 5] = 2;
+
+[SYSTEM_STATUS_TABLE] = userTableEntry;
+
+multipush(R0, R1, R2, R3, R4);
+call MOD_5;
+multipop(R0, R1, R2, R3, R4);
+
+exit: 
+	SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 13];
+	[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 9] = 0;
+
+ireturn;
