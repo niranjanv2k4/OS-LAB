@@ -1,0 +1,162 @@
+alias userSP R9;
+userSP = SP;
+
+alias sysNum R10;
+sysNum = [[PTBR + 2*(userSP - 5)/512] * 512 + (userSP - 5)%512];
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 9] = sysNum;
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 13] = SP;
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 11]* 512 - 1;
+
+alias returnAdd R11;
+returnAdd = [PTBR + 2*(userSP - 1)/512]*512 + (userSP - 1)%512;
+
+if(sysNum == INT_OPEN)then
+
+    alias processTable R3;
+    processTable = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 + RESOURCE_TABLE_OFFSET;
+
+    alias processTableEntry R4;
+    processTableEntry = 0;
+
+    while(processTableEntry < 8)do
+        if([processTable + 2*processTableEntry] == -1)then
+            break;
+        endif;
+        processTableEntry = processTableEntry + 1;
+    endwhile;
+
+    if(processTableEntry == 8)then
+        [returnAdd] = -3;
+    else
+
+        multipush(R3, R4, R9, R11);
+        R1 = OPEN;
+        R2 = [[PTBR + 2*(userSP - 4)/512] * 512 + (userSP - 4)%512];
+        call MOD_3;
+        multipop(R3, R4, R9, R11);
+        
+        if(R0 < 0)then
+            [returnAdd] = R0;
+        else
+            [processTable + processTableEntry*2] = FILE;
+            [processTable + processTableEntry*2 + 1] = R0;
+            [returnAdd] = R4;
+        endif;
+
+    endif;
+endif;  
+
+
+//CLOSE SYSCALL
+if(sysNum == INT_CLOSE)then
+    
+    alias fileDescriptor R2;
+    fileDescriptor = [[PTBR + 2*(userSP - 4)/512] * 512 + (userSP - 4)%512];
+
+    if(fileDescriptor <0 || fileDescriptor > 7)then
+        [returnAdd] = -1;
+    else
+
+        alias processTable R3;
+        processTable = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 + RESOURCE_TABLE_OFFSET;
+
+        if([processTable + fileDescriptor*2] != FILE)then
+            [returnAdd] = -1;
+        else
+            alias fileIndex R4;
+            fileIndex = [processTable + fileDescriptor*2 + 1];
+
+            multipush(R2, R3, R4, R9, R11);
+            R1 = CLOSE;
+            R2 = fileIndex;
+            call MOD_3;
+            multipop(R2, R3, R4, R9, R11);
+
+            [processTable + fileDescriptor*2] = -1;
+            [returnAdd] = 0;
+        endif;
+        
+    endif;
+        
+endif;
+
+//SEEK
+
+if(sysNum == INT_SEEK)then
+
+    alias fileDescriptor R2;
+    fileDescriptor = [[PTBR + 2*(userSP - 4)/512] * 512 + (userSP - 4)%512];
+
+    if(fileDescriptor <0 || fileDescriptor > 7)then
+        [returnAdd] = -1;
+    else
+        alias processTable R3;
+        processTable = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 + RESOURCE_TABLE_OFFSET;
+
+        if([processTable + fileDescriptor*2] == -1)then
+            [returnAdd] = -1;
+        else
+
+            alias fileIndex R4;
+            alias inodeIndex R5;
+
+            fileIndex = [processTable + fileDescriptor*2 + 1];
+            inodeIndex = [OPEN_FILE_TABLE + fileIndex*4 + 0];
+
+            multipush(R1, R2, R3, R4, R5, R9, R11);
+            R1 = ACQUIRE_INODE;
+            R2 = [SYSTEM_STATUS_TABLE + 1];
+            R3 = inodeIndex;
+            call MOD_0;
+            multipop(R1, R2, R3, R4, R5, R9, R11);
+            
+
+            if(R0 == -1)then
+                [returnAdd] = -1;
+            else
+                alias lSeek R6;
+                lSeek = OPEN_FILE_TABLE + fileIndex*4 + 2;
+
+                alias fileSize R7;
+                fileSize = [INODE_TABLE + inodeIndex*16 + 2];
+                if(inodeIndex == INODE_ROOT)then
+                    fileSize = 480;
+                endif;
+
+                alias offSet R8;
+                offSet = [[PTBR + 2*(userSP - 3)/512]*512 + (userSP - 3)%512];
+
+                if([lSeek] + offSet<0)then
+                    [returnAdd] = -2;
+                else
+                    if(offSet == 0)then
+                        [lSeek] = 0;
+                    else
+                        if([lSeek] + offSet>fileSize)then
+                            [lSeek] = fileSize;
+                        else
+                            [lSeek] = [lSeek] + offSet;
+                        endif;
+                    endif;
+
+                    [returnAdd] = 0;
+
+                endif;
+                
+                multipush(R1, R2, R3, R4, R5, R9, R11);
+                R1 = RELEASE_INODE;
+                R2 = [SYSTEM_STATUS_TABLE + 1];
+                R3 = inodeIndex;
+                call MOD_0;
+                multipop(R1, R2, R3, R4, R5, R9, R11);
+
+            endif;
+        endif;
+    endif;
+endif;
+
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 9] = 0;
+
+ireturn;

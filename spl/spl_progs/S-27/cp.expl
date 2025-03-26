@@ -1,0 +1,54 @@
+int main(){
+    decl
+        str File1, File2, file, data, i;
+        int temp, permission, fd1, fd2, root;
+    enddecl
+
+    begin
+        write("Filename: ");
+        read(File1);
+        fd1 = exposcall("Open", File1);
+        if(fd1 < 0)then
+            write("Can't Open");
+        else
+            write("Filename2: ");
+            read(File2);
+            fd2 = exposcall("Open", File2);
+            if(fd2>=0)then
+                write("Already");
+                root = exposcall("Open", "root");
+
+                while(temp == -2)do
+                    temp = exposcall("Read", root, i);
+                    if(i==File2)then
+                        temp = exposcall("Lseek", root, 3);
+                        temp = exposcall("Read", root, permission);
+                        break;
+                    endif;
+                    temp = exposcall("Lseek", root, 7);
+                endwhile;
+
+                temp = exposcall("Delete", File2);
+                if(temp<0)then
+                    write("Denied");
+                else
+                    temp = exposcall("Create", File2, permission);
+                    fd2 = exposcall("Open", File2);
+                    while(temp == -2)do
+                        temp = exposcall("Read", fd1, data);
+                        temp = exposcall("Write", fd2, data);
+                    endwhile;
+                endif;
+            else    
+                write("Created");
+                temp = exposcall("Create", File2, 0);
+                fd2 = exposcall("Open", File2);
+                while(temp == -2)do
+                    temp = exposcall("Read", fd1, data);
+                    temp = exposcall("Write", fd2, data);
+                endwhile;
+            endif;
+        endif;
+    return 0;
+    end
+}

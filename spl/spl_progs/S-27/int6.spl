@@ -1,0 +1,108 @@
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) +9 ] = 7;
+
+alias userSP R0;
+userSP = SP;
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 13] = SP;
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 11]* 512 - 1;
+
+alias fileDescriptor R1;
+fileDescriptor=[[PTBR + 2 * (userSP - 4)/512]*512 + (userSP - 4)%512];
+
+alias returnAdd R10;
+returnAdd = [PTBR + 2 * (userSP - 1) / 512] * 512 + (userSP - 1) % 512;
+
+if(fileDescriptor == -1)then
+    alias word R5;
+    word = [([PTBR + 2 * ((userSP - 3) / 512)] * 512) + ((userSP - 3) % 512)];
+    
+    multipush(R0, R1, R2, R5, R10);
+    R1 = 4;
+    R2 = [SYSTEM_STATUS_TABLE + 1];
+    R3 = word;
+    call MOD_4;
+    multipop(R0, R1, R2, R5, R10);
+
+    [returnAdd] = 0;
+else
+    
+    if(fileDescriptor<0 || fileDescriptor>7)then
+        [returnAdd] = -1;
+    else
+        alias resourceTableEntry R2;
+        resourceTableEntry = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 + RESOURCE_TABLE_OFFSET + fileDescriptor*2;
+        
+        if([resourceTableEntry + 0] != FILE)then
+            [returnAdd] = -1;
+        else
+           
+            alias openFileTable R5;
+            openFileTable = [resourceTableEntry + 1];
+
+            alias inodeIndex R4;
+            inodeIndex = [OPEN_FILE_TABLE + openFileTable*4 + 0];
+
+            multipush(R0, R1, R2, R3, R4, R5, R10);
+            R1 = ACQUIRE_INODE;
+            R2 = [SYSTEM_STATUS_TABLE + 1];
+            R3 = inodeIndex;
+            call MOD_0;
+            R11 = R0;
+            multipop(R0, R1, R2, R3, R4, R5, R10);
+
+            if(R11 == -1)then
+                [returnAdd] = -1;
+            else
+                alias lSeek R7;
+                lSeek = OPEN_FILE_TABLE + openFileTable*4 + 2;
+                alias logAdd R8;
+                logAdd = [PTBR + 2*(userSP - 3)/512]*512 + (userSP - 3)%512;
+
+                alias phyAdd R9;
+                phyAdd = [PTBR + 2*[logAdd]/512]*512 + [logAdd]%512;
+
+                if(inodeIndex == INODE_ROOT)then
+                    if([lSeek] == 480)then
+                        [returnAdd] = -2;
+                    else
+                        [phyAdd] = [ROOT_FILE + [lSeek]];
+                        [lSeek] = [lSeek] + 1;
+                        [returnAdd] = 0;
+                    endif;
+                else
+                    if([lSeek] == [INODE_TABLE + inodeIndex*16 + 2])then
+                        [returnAdd] = -2;
+                    else
+
+                        multipush(R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10);
+                        R1 = BUFFERED_READ;
+                        R2 = [INODE_TABLE + inodeIndex*16 + 8 + [lSeek]/512];
+                        R3 = [lSeek]%512;
+                        R4 = phyAdd;
+                        call MOD_3;
+                        multipop(R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10);
+
+                        [lSeek] = [lSeek] + 1;
+                        [returnAdd] = 0;
+                    endif;
+                endif;
+
+                multipush(R0, R1, R2, R3, R4, R5, R10);
+                R1 = RELEASE_INODE;
+                R2 = [SYSTEM_STATUS_TABLE + 1];
+                R3 = inodeIndex;
+                call MOD_0;
+                R10 = R0;
+                multipop(R0, R1, R2, R3, R4, R5, R10);
+
+            endif;
+        endif;
+    endif;
+endif;
+
+
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 9] = 0;
+
+ireturn;
+
