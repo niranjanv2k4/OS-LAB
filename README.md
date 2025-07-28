@@ -29,13 +29,15 @@ The project files are organized by stages inside the `STAGES` directory. Each st
 
 Starting from **Stage 13**, each stage directory includes two helper scripts:
 
-- `compiler.sh` — When run, this script will compile all the source files in the current stage folder, perform necessary setup steps, **and automatically execute** the `run.sh` script to run the compiled code.
+- `compiler.sh` — When run, this script will compile all the source files in the current stage folder, perform necessary setup steps, **and automatically execute** the `run.sh` script to run the compiled code.  
+  **⚠️ Important:** You **must** update the path to the source files inside `compiler.sh` according to your directory structure before running it, otherwise compilation may fail.
 
 You just need to execute this script inside the stage folder:
     example:
 ```bash
 cd STAGES/Stage13
 ./compiler.sh
+
 ```
 Then: you go to xsm directory and start the machine.
 
